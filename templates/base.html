@@ -27,11 +27,11 @@
           <a class="navbar-brand" href="#">
             <img src="static/images/logo.png" width="50" alt="">
           </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <button class="navbar-toggler mx-2" type="button" data-toggle="collapse" data-target="#myNavbar" aria-controls="myNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
 
-          <div class="collapse navbar-collapse">
+          <div class="collapse navbar-collapse justify-content-between align-items-center w-100" id="myNavbar">
             <ul class="navbar-nav mr-auto">
               <li class="nav-item {% if index_page %}active{% endif %}">
                 <a class="nav-link" href="{{ url_for('index') }}">
@@ -49,9 +49,7 @@
                 </a>
               </li>
             </ul>
-          </div>
-          <div class="navbar-nav mr-auto">
-            <ul class="navbar-nav ml-auto">
+            <ul class="navbar-nav flex-row justify-content-center flex-nowrap pr-2">
               <li class="nav-item dropdown"  id="navbarSupportedContent">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="fas fa-upload"></i> add
