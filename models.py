@@ -33,11 +33,11 @@ class Theme(Base):
 class Question(Base):
     __tablename__ = 'question'
     id = Column(Integer, primary_key=True)
-    text = Column(String())
+    text = Column(String(32768))
     player_id = Column(Integer, ForeignKey('player.id'))
     theme_id = Column(Integer, ForeignKey('theme.id'))
     date = Column(Date, nullable=False, default=datetime.now())
-    comments = Column(String())
+    comments = Column(String(32768))
     attachments = Column(String(128))
 
     def __init__(self, text, player_id, theme_id, date=datetime.now(), comments=None, attachments=None):
@@ -52,7 +52,7 @@ class Question(Base):
 class Answer(Base):
     __tablename__ = 'answer'
     id = Column(Integer, primary_key=True)
-    text = Column(String())
+    text = Column(String(32768))
     player_id = Column(Integer, ForeignKey('player.id'))
     question_id = Column(Integer, ForeignKey('question.id'))
     points = Column(Numeric(precision=5, scale=3))
