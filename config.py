@@ -8,7 +8,7 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = 'filak'
     # SQLALCHEMY_DATABASE_URI = "postgresql:///postgres"
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:filak@localhost:5432/postgres"
+    # SQLALCHEMY_DATABASE_URI = "postgresql://postgres:filak@localhost:5432/postgres"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
