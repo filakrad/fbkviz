@@ -29,11 +29,15 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def index():
-    import question
-    q, a = question.get_random_question()
-    print(db.engine.pool.status())
-    return render_template("main_page.html", index_page=True,
-            question=q, answer=a)
+    try:
+        import question
+        q, a = question.get_random_question()
+        print(db.engine.pool.status())
+        return render_template("main_page.html", index_page=True,
+                question=q, answer=a)
+    except:
+        db.init_db()
+        return "db initialized"
 
 
 @app.route('/questions')
