@@ -1,12 +1,12 @@
 from db import Base
-from sqlalchemy import Column, Integer, Date, String, ForeignKey, Numeric, Boolean
+from sqlalchemy import Column, Integer, Date, Unicode, ForeignKey, Numeric, Boolean
 from datetime import datetime
 
 
 class Player(Base):
     __tablename__ = 'player'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50))
+    name = Column(Unicode(50))
     date_start = Column(Date, nullable=False, default=datetime.now())
     date_end = Column(Date)
     score = 0
@@ -20,7 +20,7 @@ class Player(Base):
 class Theme(Base):
     __tablename__ = 'theme'
     id = Column(Integer, primary_key=True)
-    name = Column(String(100))
+    name = Column(Unicode(100))
     player_id = Column(Integer, ForeignKey('player.id'))
     date = Column(Date, nullable=False, default=datetime.now())
 
@@ -33,12 +33,12 @@ class Theme(Base):
 class Question(Base):
     __tablename__ = 'question'
     id = Column(Integer, primary_key=True)
-    text = Column(String(32768))
+    text = Column(Unicode(32768))
     player_id = Column(Integer, ForeignKey('player.id'))
     theme_id = Column(Integer, ForeignKey('theme.id'))
     date = Column(Date, nullable=False, default=datetime.now())
-    comments = Column(String(32768))
-    attachments = Column(String(128))
+    comments = Column(Unicode(32768))
+    attachments = Column(Unicode(128))
 
     def __init__(self, text, player_id, theme_id, date=datetime.now(), comments=None, attachments=None):
         self.text = text
@@ -52,7 +52,7 @@ class Question(Base):
 class Answer(Base):
     __tablename__ = 'answer'
     id = Column(Integer, primary_key=True)
-    text = Column(String(32768))
+    text = Column(Unicode(32768))
     player_id = Column(Integer, ForeignKey('player.id'))
     question_id = Column(Integer, ForeignKey('question.id'))
     points = Column(Numeric(precision=5, scale=3))
