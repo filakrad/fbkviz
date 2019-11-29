@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1>Přidej novou otázku</h1>
+    </div>
+    <div class="container">
+        <form method="POST">
+
+                <label for="text">Text</label>
+                <div class="form-row">
+                    <input class="form-control" type="text" placeholder="text otázky" id="text" name="text">
+                </div>
+                <br>
+                <label for="player">Zadal</label>
+                <select class="browser-default custom-select" name="player" id="player">
+                    {% for player in players %}
+                        <option value ="{{ player.id }}">{{ player.name }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <br>
+                <label for="theme">Téma</label>
+                <select class="browser-default custom-select" name="theme" id="theme">
+                    {% for theme in themes %}
+                        <option value ="{{ theme.id }}">{{ theme.name }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <br>
+                <div class="form-row ">
+                    <label for="date">Datum</label>
+                    <input class="form-control " type="date" placeholder="Zadáno dne" id="date" name="date">
+                </div>
+                <br>
+                <label for="comments">Komentáře</label>
+                <div class="form-row">
+                    <input class="form-control" type="text" placeholder="Je-li třeba říci něco navíc" id="comments" name="comments">
+                </div>
+                <br>
+                <label for="attachment">Příloha</label>
+                <div class="form-row">
+                    <input class="form-control" type="text" placeholder="Zatím nefunguje :-)" id="attachment" name="attachment">
+                </div>
+
+                <br>
+                <button type="submit " class="btn btn-primary " style="float:right ">Submit</button>
+        </form>
+        {% if inserted %}
+            <p>
+                inserted theme {{ inserted.name }} by {{ inserted.player_id }} from {{ inserted.date }}
+            </p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1>Přidej nového hráče</h1>
+    </div>
+    <div class="container">
+        <form method="POST">
+
+                <label for="name">Jméno</label>
+                <div class="form-row">
+                    <input class="form-control" type="text" placeholder="Jméno hráče" id="name" name="name">
+                </div>
+                <br>
+                <div class="form-row ">
+                    <label for="date_start">První účast</label>
+                    <input class="form-control " type="date" placeholder="Narozen/a" id="date_start" name="date_start">
+                </div>
+
+                <br>
+                <button type="submit " class="btn btn-primary " style="float:right ">Submit</button>
+
+        </form>
+    </div>
+{% endblock %}

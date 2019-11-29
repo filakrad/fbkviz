@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+
+    <h2>Skóre</h2>
+
+    <table class="table table-condensed table-bordered table-striped">
+        <thead>
+            <th>id</th>
+            <th>jméno</th>
+            <th>skóre</th>
+        </thead>
+        <tbody>
+            {% for player in simple_scores %}
+                <tr>
+                    <td>{{ player.id }}</td>
+                    <td>{{ player.name }}</td>
+                    <td>{{ player.score }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    <div class="container">
+
+    <h2>Zadal vs uhodl</h2>
+
+    <table class="table table-condensed table-hover table-bordered small
+          text-nowrap table-striped">
+        <tbody>
+            {% for line in score_table %}
+                <tr>
+                    {% for cell in line %}
+                    <td align="center">{{cell}}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

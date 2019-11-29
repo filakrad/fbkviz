@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1>Přidej novou odpověď</h1>
+    </div>
+    <div class="container">
+        <form method="POST">
+
+                <label for="text">Odpověď</label>
+                <div class="form-row">
+                    <input class="form-control" type="text" placeholder="text odpovědi" id="text" name="text">
+                </div>
+                <br>
+                <label for="player">Odpověděl</label>
+                <select class="browser-default custom-select form-row" name="player" id="player">
+                    {% for player in players %}
+                        <option value ="{{ player.id }}">{{ player.name }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <br>
+                <label for="question">Otázka</label>
+                <select class="browser-default custom-select form-row" name="question" id="question">
+                    {% for question in questions %}
+                        <option value ="{{ question.id }}">{{ question.text }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <br>
+                <div class="form-row ">
+                    <label for="points">Body</label>
+                    <input class="form-control " type="number" step="any" placeholder="Počet bodů" id="points" name="points">
+                </div>
+                <br>
+                <label for="win">Vyhrál?</label>
+                <div class="form-row">
+                    <input class="form-control" type="checkbox" id="win" name="win">
+                </div>
+
+                <br>
+                <button type="submit " class="btn btn-primary " style="float:right ">Submit</button>
+        </form>
+        {% if inserted %}
+            <p>
+                inserted theme {{ inserted.name }} by {{ inserted.player_id }} from {{ inserted.date }}
+            </p>
+        {% endif %}
+    </div>
+{% endblock %}

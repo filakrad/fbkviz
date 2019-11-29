@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>FB kvíz</h1>
+    </div>
+    <div class="container">
+        <h2>Náhodná otázka</h2>
+        <p>
+            {{question.text}}
+        </p>
+        <p>
+          <a class="btn btn-primary" data-toggle="collapse" href="#answerCollapse" role="button" aria-expanded="false" aria-controls="answerCollapse">Ukaž odpověď</a>
+        </p>
+        <div class="collapse multi-collapse" id="answerCollapse">
+          {{answer.text}}
+        </div>
+    </div>
+{% endblock %}

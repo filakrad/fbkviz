@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+    <h2>Otázky</h2>
+
+    <table class="table table-condensed table-hover table-bordered small
+          text-nowrap table-striped">
+        <thead>
+            <th>theme</th>
+            <th>theme by</th>
+            <th>date</th>
+            <th>question</th>
+            <th>by</th>
+            <th>won</th>
+            <th>comments</th>
+        </thead>
+        <tbody>
+            {% set ns = namespace(theme_name='', idx = 0) %}
+            {% for q in question %}
+                <tr>
+                    {% if ns.theme_name == q.theme_name %}
+                    {% else %}
+                        <td rowspan = {{ span_list[ns.idx] }} class = "centered">{{ q.theme_name }} </td>
+                        <td rowspan = {{ span_list[ns.idx] }} class = "centered">{{ q.theme_by }}</td>
+                        {% set ns.theme_name = q.theme_name %}
+                        {% set ns.idx = ns.idx + 1 %}
+                    {% endif %}
+
+                    <td>{{ q.date }}</td>
+                    <td  style = "
+                          max-width: 500px;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                          white-space: nowrap;"  title="{{ q.text }}">
+                        {{ q.text }}</td>
+                    <td>{{ q.by }}</td>
+                    <td>{{ q.won }}</td>
+                    <td style = "
+                          max-width: 100px;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                          white-space: nowrap;"  title="{{ q.comments }}">
+                        {{ q.comments }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+{% endblock %}
