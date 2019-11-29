@@ -32,7 +32,7 @@ def get_questions():
         Theme, Question.theme_id == Theme.id).join(
         pt_alias, Theme.player_id == pt_alias.id).join(
         Answer, Question.id == Answer.question_id, isouter=True).join(
-        pa_alias, Answer.player_id == pa_alias.id, isouter=True)
+        pa_alias, Answer.player_id == pa_alias.id, isouter=True).order_by(Question.date)
     questions = db.session.execute(questions_query)
     head = questions.keys()
     questions_list = [row2dict(s, head) for s in questions]
@@ -57,6 +57,7 @@ def get_random_question():
         Question.text.label('text')).order_by(func.random()).limit(1)
     question = db.session.execute(question_query)
     head = question.keys()
+    question_out = []
     for q in question:
         question_out = row2dict(q, head)
 
