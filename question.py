@@ -75,3 +75,17 @@ def get_random_question():
         answer_out = {'text': 'Nenašel jsem správnou odpověď.'}
 
     return question_out, answer_out
+
+def get_answer_by_question_id(id):
+    answer_query = db.session.query(
+        Answer.text.label('text')
+    ).filter(and_(Answer.question_id == id,
+                  Answer.win == True))
+    answer = db.session.execute(answer_query)
+    head = answer.keys()
+    for a in answer:
+        answer_out = row2dict(a, head)
+        break
+    else:
+        answer_out = {'text': 'Nenašel jsem správnou odpověď.'}
+    return answer_out

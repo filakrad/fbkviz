@@ -1,0 +1,82 @@
+<html>
+  <head>
+    {% block head -%}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if title -%}
+    <title>{{ title }} - FB kviz</title>
+    {% else -%}
+    <title>FB kviz</title>
+    {%- endif -%}
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-reboot.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/fontawesome-free-5.11.2-web/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/fbkviz.css" />
+<!--    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    {% endblock head -%}
+  </head>
+  <body>
+    {% block body -%}
+    <div class="container">
+    <h2>Otázky</h2>
+
+    <table class="table table-condensed table-hover table-bordered small
+          text-nowrap table-striped">
+        <thead>
+            <th>theme</th>
+            <th>theme by</th>
+            <th>date</th>
+            <th>question</th>
+            <th>by</th>
+            <th>won</th>
+            <th>comments</th>
+        </thead>
+        <tbody>
+                <tr>
+                    <td class = "centered"> theme </td>
+                    <td class = "centered"> theme by </td>
+                    <td>1. 1. 2019</td>
+                    <td>
+                        <a href="{{ url_for('insert_question') }}" data-toggle="modal" data-target="#question-modal">
+                        <i class="fas fa-search"></i></a>
+                        some really long and boring but somewhat important text</td>
+                    <td>Some Name</td>
+                    <td> 1 </td>
+                    <td> not so long text </td>
+                </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <div class="modal" id="question-modal" tabindex="-1" role="dialog" aria-labelledby="question-modal-label" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+              <h1 class="text-center"><i class="fa fa-spinner fa-spin"></i></h1>
+            </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+
+$('#question-modal').on('show.bs.modal', function (event) {
+  var found = $(this).find('.modal-content').html('<h1 class="text-center"><i class="fas fa-spinner fa-spin"></i></h1>');
+  var button = $(event.relatedTarget); // Button that triggered the modal
+  var modal = $(this).find('.modal-content');
+  console.log(button.attr('href'));
+  console.log(modal);
+  console.log($('#question-modal').data('bs.modal'));
+  modal.load(event.relatedTarget.href);
+})
+
+
+</script>
+
+
+    {% endblock body -%}
+  </body>
+
+
+</html>

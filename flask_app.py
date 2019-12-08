@@ -46,7 +46,7 @@ def show_questions():
     questions, span_list = question.get_questions()
     print(db.engine.pool.status())
     return render_template("questions.html", questions_page=True,
-            question=questions, span_list=span_list)
+            question=questions, span_list=span_list, prev_id=2, next_id=4)
 
 
 @app.route('/scores')
@@ -187,6 +187,26 @@ def insert_answer():
     print(db.engine.pool.status())
     return render_template("insert_answer.html", insert_answer_page=True,
                            players=players, questions=questions, inserted=new_answer)
+
+@app.route('/question/<int:id>/')
+def present_question_modal(id):
+    print("id {}".format(id))
+    from models import Question
+    import question as q_module
+    questions = Question.query.filter(Question.id == id).all()
+    head = ["id", "text"]
+    questions = [row2dict(t, head) for t in questions]
+    question = questions[0]
+    a = q_module.get_answer_by_question_id(question['id'])
+    next_id = question['id'] + 1
+    prev_id = question['id'] - 1
+    return render_template("question_modal.html",  question=question,
+                           next_id=next_id, prev_id=prev_id, answer=a)
+
+
+@app.route('/minimal/')
+def minimal_fct():
+    return render_template("minimal.html")
 
 if __name__ == "__main__":
     app.run(debug=True, port=5957)
