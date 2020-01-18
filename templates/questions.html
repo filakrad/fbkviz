@@ -6,10 +6,10 @@
     <h2>Otázky</h2>
 
     <table class="table table-condensed table-hover table-bordered small
-          text-nowrap table-striped">
+          text-nowrap table-striped w-auto">
         <thead>
             <th>theme</th>
-            <th>theme by</th>
+            <th>by</th>
             <th>date</th>
             <th>question</th>
             <th>by</th>
@@ -22,7 +22,9 @@
                 <tr>
                     {% if ns.theme_name == q.theme_name %}
                     {% else %}
-                        <td rowspan = {{ span_list[ns.idx] }} class = "centered">{{ q.theme_name }} </td>
+                        <td rowspan = {{ span_list[ns.idx] }} class = "centered" style = "
+                          max-width: 150px;
+                          white-space: break-spaces;">{{ q.theme_name }} </td>
                         <td rowspan = {{ span_list[ns.idx] }} class = "centered">{{ q.theme_by }}</td>
                         {% set ns.theme_name = q.theme_name %}
                         {% set ns.idx = ns.idx + 1 %}

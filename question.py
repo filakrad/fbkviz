@@ -33,7 +33,7 @@ def get_all_questions():
         Theme, Question.theme_id == Theme.id).join(
         pt_alias, Theme.player_id == pt_alias.id).join(
         Points, and_(Question.id == Points.question_id, Points.win == True), isouter=True).join(
-        pa_alias, Points.player_id == pa_alias.id, isouter=True).order_by(Question.date)
+        pa_alias, Points.player_id == pa_alias.id, isouter=True).order_by(Question.date, Question.id)
     questions = db.session.execute(questions_query)
     head = questions.keys()
     questions_list = [row2dict(s, head) for s in questions]

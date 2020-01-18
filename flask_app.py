@@ -191,5 +191,20 @@ def present_question_modal(id):
 def minimal_fct():
     return render_template("minimal.html")
 
+
+@app.route('/import_csv/', methods=['GET', 'POST'])
+def import_csv():
+    if request.method == 'POST':
+        import attachment
+        if 'in_csv' not in request.files:
+            print(request.files)
+            attach = None
+        else:
+            attach = attachment.save_attachments(request.files['in_csv'])
+        import load_from_csv
+        load_from_csv.process_csv(attachment.get_path(attach))
+        attachment.delete_attachment(attach)
+    return render_template("import_csv.html")
+
 if __name__ == "__main__":
     app.run(debug=True, port=5957)
