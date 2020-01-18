@@ -17,7 +17,7 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def index():
-    # try:
+    try:
         import question
         import attachment
         q = question.get_random_question()
@@ -26,9 +26,9 @@ def index():
             q["correct_answer"] = "Nenašel jsem správnou odpověď"
         print(db.engine.pool.status())
         return render_template("main_page.html", index_page=True, question=q)
-    # except:
-    #     db.init_db()
-    #     return "db initialized"
+    except:
+        db.init_db()
+        return "db initialized"
 
 
 @app.route('/questions')
