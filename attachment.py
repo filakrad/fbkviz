@@ -6,13 +6,21 @@ ATTACHMENTS = "static/attachments"
 
 def save_attachments(file):
     if file.filename == '':
-        attachments = None
+        name = None
     else:
-        attachments = secure_filename(file.filename)
-        file.save(os.path.join(ATTACHMENTS, attachments))
-    return attachments
+        name = secure_filename(file.filename)
+        file.save(get_path(name))
+    return name
 
 
 def append_attachment(question):
     if question["attachments"]:
-        question["attachments"] = os.path.join(ATTACHMENTS, question["attachments"])
+        question["attachments"] = get_path(question["attachments"])
+
+
+def get_path(name):
+    return os.path.join(ATTACHMENTS, name)
+
+
+def delete_attachment(name):
+    os.remove(get_path(name))

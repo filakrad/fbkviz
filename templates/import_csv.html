@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1>Nahraj soubor</h1>
+    </div>
+    <div class="container">
+        <form method="POST" enctype="multipart/form-data">
+
+                <label for="in_csv">Vlož CSV</label>
+                <div class="form-row">
+                    <input type=file class="form-control-file" id="in_csv"  name="in_csv">
+                </div>
+
+                <button type="submit " class="btn btn-primary " style="float:right ">Submit</button>
+
+        </form>
+    </div>
+
+
+
+{% endblock %}
