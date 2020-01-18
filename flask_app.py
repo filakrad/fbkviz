@@ -1,16 +1,10 @@
 
 from flask import Flask, render_template, request
-from flask_login import LoginManager, current_user
 from sqlalchemy import desc
 import config
 import db
 
-
 app = Flask(__name__)
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'signin'
 
 app.config.from_object(config.DevelopmentConfig)
 app.jinja_env.add_extension('jinja2.ext.do')
@@ -21,29 +15,28 @@ def shutdown_session(exception=None):
     db.session.remove()
 
 
-
-# @app.route('/')
-# def hello_world():
-#     return 'Hello from Flask!'
-
-
 @app.route('/')
 def index():
-    try:
+    # try:
         import question
-        q, a = question.get_random_question()
+        import attachment
+        q = question.get_random_question()
+        attachment.append_attachment(q)
+        if not q["correct_answer"]:
+            q["correct_answer"] = "Nenašel jsem správnou odpověď"
         print(db.engine.pool.status())
-        return render_template("main_page.html", index_page=True,
-                question=q, answer=a)
-    except:
-        db.init_db()
-        return "db initialized"
+        return render_template("main_page.html", index_page=True, question=q)
+    # except:
+    #     db.init_db()
+    #     return "db initialized"
 
 
 @app.route('/questions')
 def show_questions():
     import question
-    questions, span_list = question.get_questions()
+    questions = question.get_all_questions()
+    span_list = question.get_span_list(questions)
+    print(span_list)
     print(db.engine.pool.status())
     return render_template("questions.html", questions_page=True,
             question=questions, span_list=span_list, prev_id=2, next_id=4)
@@ -115,6 +108,7 @@ def insert_theme():
     return render_template("insert_theme.html", insert_theme_page=True,
                            players=players, inserted=new_theme)
 
+
 @app.route('/insert_question',methods=['GET', 'POST'])
 def insert_question():
     from models import Player
@@ -128,25 +122,10 @@ def insert_question():
     themes = [row2dict(t, head) for t in themes]
     new_question = None
     if request.method == 'POST':
-        from models import Question
-        text = request.form.get('text')
-        player_id = int(request.form.get('player'))
-        theme_id = int(request.form.get('theme'))
-        date = request.form.get('date')
-        comments = request.form.get('comments')
-        attachments = request.form.get('attachments')
-        try:
-            new_question = Question(
-                text=text,
-                player_id=player_id,
-                theme_id=theme_id,
-                date=date,
-                comments=comments
-            )
-            db.session.add(new_question)
-            db.session.commit()
-        except Exception as e:
-            return str(e)
+        import question
+        import score
+        new_question = question.insert_question(request)
+        new_score = score.insert_points(request, new_question.id)
     print(db.engine.pool.status())
     return render_template("insert_question.html", insert_question_page=True,
                            players=players, themes=themes, inserted=new_question)
@@ -188,20 +167,24 @@ def insert_answer():
     return render_template("insert_answer.html", insert_answer_page=True,
                            players=players, questions=questions, inserted=new_answer)
 
+
 @app.route('/question/<int:id>/')
 def present_question_modal(id):
     print("id {}".format(id))
-    from models import Question
     import question as q_module
-    questions = Question.query.filter(Question.id == id).all()
-    head = ["id", "text"]
-    questions = [row2dict(t, head) for t in questions]
-    question = questions[0]
-    a = q_module.get_answer_by_question_id(question['id'])
+    import attachment
+    import score
+    question = q_module.get_question_by_id(id)
+    print(question)
+    attachment.append_attachment(question)
+    if not question["correct_answer"]:
+        question["correct_answer"] = "Nenašel jsem správnou odpověď"
+    all_points = score.get_question_score(question["id"])
     next_id = question['id'] + 1
     prev_id = question['id'] - 1
     return render_template("question_modal.html",  question=question,
-                           next_id=next_id, prev_id=prev_id, answer=a)
+                           points=all_points,
+                           next_id=next_id, prev_id=prev_id)
 
 
 @app.route('/minimal/')

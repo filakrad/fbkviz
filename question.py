@@ -1,41 +1,52 @@
 from models import Player
 from models import Theme
 from models import Question
-from models import Answer
+from models import Points
 from sqlalchemy import func, and_
 from sqlalchemy.orm import aliased
 import db
+import attachment
 
 
 def row2dict(row, headers):
-    d = {}
-    for key in headers:
-        d[key] = row[key] if row[key] is not None else ''
-    return d
+    return {i: row[i] if row[i] is not None else '' for i in headers}
 
 
-def get_questions():
-    pt_alias = aliased(Player) # join Player and Theme
-    pa_alias = aliased(Player) # join Player and Answer
+def get_all_questions():
+    '''
+    Gets all data expected in /question web page
+    :return: list of dictionaries
+    '''
+    pt_alias = aliased(Player)  # join Player and Theme
+    pa_alias = aliased(Player)  # join Player and Answer
     questions_query = db.session.query(
         Question.id.label('id'),
         Question.date.label('date'),
         Question.text.label('text'),
         Question.comments.label('comments'),
-        Question.attachments.label('attachment_path'),
         Player.name.label('by'),
         Theme.name.label('theme_name'),
         pt_alias.name.label('theme_by'),
-        Answer.id.label('answer_id'),
+        Points.id.label('answer_id'),
         pa_alias.name.label('won')
     ).join(Player, Question.player_id == Player.id).join(
         Theme, Question.theme_id == Theme.id).join(
         pt_alias, Theme.player_id == pt_alias.id).join(
-        Answer, Question.id == Answer.question_id, isouter=True).join(
-        pa_alias, Answer.player_id == pa_alias.id, isouter=True).order_by(Question.date)
+        Points, and_(Question.id == Points.question_id, Points.win == True), isouter=True).join(
+        pa_alias, Points.player_id == pa_alias.id, isouter=True).order_by(Question.date)
     questions = db.session.execute(questions_query)
     head = questions.keys()
     questions_list = [row2dict(s, head) for s in questions]
+    return questions_list
+
+
+def get_span_list(questions_list):
+    '''
+    The table in /questions web page has some row spans, because questions are grouped by theme.
+    This function finds how large should span be.
+    :param questions_list: list of all questions
+    :return: list of rowspan lengths
+    '''
     span_list = []
     theme_name = questions_list[0]["theme_name"]
     idx = 0
@@ -47,45 +58,86 @@ def get_questions():
             theme_name = q["theme_name"]
             idx = 1
     span_list.append(idx)
-    return questions_list, span_list
+    return span_list
+
+
+def get_question_by_id(qid):
+    '''
+    Search database for questions with id qid
+    :param qid: id of desired question
+    :returns: question transformed to dictionary
+    '''
+    question = Question.query.filter(Question.id == qid).all()
+    return question_to_dict(question)
 
 
 def get_random_question():
-    '''get random question'''
-    question_query = db.session.query(
-        Question.id.label('id'),
-        Question.text.label('text')).order_by(func.random()).limit(1)
-    question = db.session.execute(question_query)
-    head = question.keys()
-    question_out = []
-    for q in question:
-        question_out = row2dict(q, head)
+    '''
+    Search database for questions and returns random one
+    :returns: question transformed to dictionary
+    '''
+    question = Question.query.order_by(func.random()).limit(1)
+    return question_to_dict(question)
 
-    '''get corresponding answer'''
-    answer_query = db.session.query(
-            Answer.text.label('text')
-        ).filter(and_(Answer.question_id==question_out["id"],
-                         Answer.win==True))
-    answer = db.session.execute(answer_query)
-    head = answer.keys()
-    for a in answer:
-        answer_out = row2dict(a, head)
-        break
+
+def question_to_dict(question):
+    '''
+    Translates Question from DB to dictionary
+    :param question: as returned by db
+    :return: question as dict
+    '''
+    head = question[0].__table__.columns.keys()
+    question_dict = {key: question[0].__dict__[key] for key in head}
+    correct_answer_check(question_dict)
+    try:
+        return question_dict
+    except NameError:
+        '''dict wasn't generated for some reason'''
+        return {}
+
+
+def correct_answer_check(q_dict):
+    '''
+    Check if there is correct_answer value in a dict. If not, it is supplemented with some error text.
+    If this key is missing, it is added.
+    :param q_dict: dictionary containing correct_answer key
+    '''
+    missing_text = "Nenašel jsem správnou odpověď"
+    key = "correct_answer"
+    try:
+        if q_dict[key] is None or q_dict[key] == "":
+            q_dict[key] = missing_text
+    except KeyError:
+        q_dict[key] = missing_text
+
+
+def insert_question(request):
+    text = request.form.get('text')
+    player_id = int(request.form.get('player_question'))
+    theme_id = int(request.form.get('theme'))
+    date = request.form.get('date')
+    comments = request.form.get('comments')
+    print(request.form)
+    if 'attachments' not in request.files:
+        print(request.files)
+        attach = None
     else:
-        answer_out = {'text': 'Nenašel jsem správnou odpověď.'}
-
-    return question_out, answer_out
-
-def get_answer_by_question_id(id):
-    answer_query = db.session.query(
-        Answer.text.label('text')
-    ).filter(and_(Answer.question_id == id,
-                  Answer.win == True))
-    answer = db.session.execute(answer_query)
-    head = answer.keys()
-    for a in answer:
-        answer_out = row2dict(a, head)
-        break
-    else:
-        answer_out = {'text': 'Nenašel jsem správnou odpověď.'}
-    return answer_out
+        attach = attachment.save_attachments(request.files['attachments'])
+    correct_answer = request.form.get('correct_answer')
+    try:
+        new_question = Question(
+            text=text,
+            player_id=player_id,
+            theme_id=theme_id,
+            date=date,
+            comments=comments,
+            attachments=attach,
+            correct_answer=correct_answer
+        )
+        db.session.add(new_question)
+        db.session.flush()
+        db.session.refresh(new_question)
+    except Exception as e:
+        return str(e)
+    print("new question", new_question)
+    return new_question

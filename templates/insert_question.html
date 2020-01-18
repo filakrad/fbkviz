@@ -6,7 +6,7 @@
         <h1>Přidej novou otázku</h1>
     </div>
     <div class="container">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
 
                 <label for="text">Text</label>
                 <div class="form-row">
@@ -14,7 +14,7 @@
                 </div>
                 <br>
                 <label for="player">Zadal</label>
-                <select class="browser-default custom-select" name="player" id="player">
+                <select class="browser-default custom-select" name="player_question" id="player_question">
                     {% for player in players %}
                         <option value ="{{ player.id }}">{{ player.name }}</option>
                     {% endfor %}
@@ -39,13 +39,47 @@
                     <input class="form-control" type="text" placeholder="Je-li třeba říci něco navíc" id="comments" name="comments">
                 </div>
                 <br>
-                <label for="attachment">Příloha</label>
+                <label for="attachments">Příloha</label>
                 <div class="form-row">
-                    <input class="form-control" type="text" placeholder="Zatím nefunguje :-)" id="attachment" name="attachment">
+                    <input type=file class="form-control-file" id="attachments"  name="attachments">
                 </div>
-
+                <br>
+                <label for="correct_answer">Správná odpověď</label>
+                <div class="form-row">
+                    <input class="form-control" type="text" placeholder="Kompletní správná odpověď" id="correct_answer" name="correct_answer">
+                </div>
+                <br>
+                <div id="player_field">
+                    <div class="form-row" id="player_field0" name="player_field0">
+                        <div class="form-group col-md-4">
+                        <label for="player_points0">hráč</label>
+                        <select class="browser-default custom-select" name="player_points0" id="player_points0">
+                            {% for player in players %}
+                                <option value ="{{ player.id }}">{{ player.name }}</option>
+                            {% endfor %}
+                        </select>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="points0">body</label>
+                            <input class="form-control" type="text" placeholder="0" id="points0" name="points0" value="0">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="bonus_points0">bonusové body</label>
+                            <input class="form-control" type="text" placeholder="0" id="bonus_points0" name="bonus_points0" value="0">
+                        </div>
+                        <div class="form-group col-md-1">
+                            <label for="win0" class="active">vyhrál?</label>
+                            <input class="form-control" type="checkbox" id="win0" name="win0" checked>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="add_more">Add player</label>
+                            <button type="button" id="add_more" name="add_more" class="btn btn-primary">Add player</button>
+                        </div>
+                    </div>
+                </div>
                 <br>
                 <button type="submit " class="btn btn-primary " style="float:right ">Submit</button>
+
         </form>
         {% if inserted %}
             <p>
@@ -53,4 +87,25 @@
             </p>
         {% endif %}
     </div>
+
+
+<script type="text/javascript">
+$(document).ready(function () {
+    var next = 0;
+    $("#add_more").click(function(e){
+        e.preventDefault();
+        var addto = "#player_field" + next;
+        var addRemove = "#player_field" + (next);
+        next = next + 1;
+        var newIn = ' <div id="player_field'+ next +'" player_field="player_field'+ next +' " class="form-row"><div class="form-group col-md-4"><label for="player_points'+ next +'">hráč</label><select class="browser-default custom-select" name="player_points'+ next +'" id="player_points'+ next +'">{% for player in players %}<option value ="{{ player.id }}">{{ player.name }}</option>{% endfor %}</select></div><div class="form-group col-md-2"><label for="points'+ next +'">body</label><input class="form-control" type="text" placeholder="0" id="points'+ next +'" name="points'+ next +'" value="0"></div><div class="form-group col-md-2"><label for="bonus_points'+ next +'">bonusové body</label><input class="form-control" type="text" placeholder="0" id="bonus_points'+ next +'" name="bonus_points'+ next +'" value="0"></div><div class="form-group col-md-1"><label for="win'+ next +'">vyhrál?</label><input class="form-control" type="checkbox" id="win'+ next +'" name="win'+ next +'"></div></div></div>';
+        var newInput = $(newIn);
+        $(addto).after(newInput);
+        $("#player_field" + next).attr('data-source',$(addto).attr('data-source'));
+        $("#count").val(next);
+    });
+
+});
+</script>
+
+
 {% endblock %}

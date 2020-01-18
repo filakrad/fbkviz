@@ -10,11 +10,14 @@
         <p>
             {{question.text}}
         </p>
+        {% if question.attachments %}
+            <img src="{{ question.attachments }}" class="img-fluid">
+        {% endif %}
         <p>
           <a class="btn btn-primary" data-toggle="collapse" href="#answerCollapse" role="button" aria-expanded="false" aria-controls="answerCollapse">Ukaž odpověď</a>
         </p>
         <div class="collapse multi-collapse" id="answerCollapse">
-          {{answer.text}}
+          {{question.correct_answer}}
         </div>
     </div>
 {% endblock %}
