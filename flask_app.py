@@ -177,6 +177,7 @@ def present_question_modal(id):
     question = q_module.get_question_by_id(id)
     print(question)
     attachment.append_attachment(question)
+    print(question["attachments"])
     if not question["correct_answer"]:
         question["correct_answer"] = "Nenašel jsem správnou odpověď"
     all_points = score.get_question_score(question["id"])

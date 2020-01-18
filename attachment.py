@@ -19,7 +19,9 @@ def append_attachment(question):
 
 
 def get_path(name):
-    return os.path.join(ATTACHMENTS, name)
+    path = os.path.join(os.path.curdir, "static", "attachments")
+    print(path)
+    return os.path.join(path, name)
 
 
 def delete_attachment(name):
