@@ -131,43 +131,6 @@ def insert_question():
                            players=players, themes=themes, inserted=new_question)
 
 
-@app.route('/insert_answer',methods=['GET', 'POST'])
-def insert_answer():
-    from models import Player
-    from models import Question
-    players = Player.query.all()
-    questions = Question.query.order_by(desc(Question.date)).all()
-    print(questions)
-    head = ["id", "name"]
-    players = [row2dict(p, head) for p in players]
-    head = ["id", "text"]
-    questions = [row2dict(t, head) for t in questions]
-    new_answer = None
-    if request.method == 'POST':
-        from models import Answer
-        text = request.form.get('text')
-        player_id = int(request.form.get('player'))
-        question_id = int(request.form.get('question'))
-        points = request.form.get('points')
-        win = request.form.get('win') is not None
-        print("\n\n{}\n\n".format(win))
-        try:
-            new_answer = Answer(
-                text=text,
-                player_id=player_id,
-                question_id=question_id,
-                points=points,
-                win=win
-            )
-            db.session.add(new_answer)
-            db.session.commit()
-        except Exception as e:
-            return str(e)
-    print(db.engine.pool.status())
-    return render_template("insert_answer.html", insert_answer_page=True,
-                           players=players, questions=questions, inserted=new_answer)
-
-
 @app.route('/question/<int:id>/')
 def present_question_modal(id):
     print("id {}".format(id))
