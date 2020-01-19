@@ -3,11 +3,11 @@
   <div class="text-center">
       <div class="btn-group">
         {% if prev_id %}
-        <a href="{{ url_for('present_question_modal', id=prev_id) }}" data-toggle="modal" data-target="#question-modal" class="btn btn-default">
+        <a href="{{ url_for('present_question_modal', id=prev_id) }}" class="li-modal btn btn-default">
           <i class="fas fa-arrow-left"></i></a>
         {% endif %}
         {% if next_id %}
-        <a href="{{ url_for('present_question_modal', id=next_id) }}" data-toggle="modal" data-target="#question-modal" class="btn btn-default">
+        <a href="{{ url_for('present_question_modal', id=next_id) }}" class="li-modal btn btn-default">
           <i class="fas fa-arrow-right"></i></a>
         {% endif %}
       </div>
@@ -54,3 +54,13 @@
     </table>
     {% endif %}
 </div>
+
+<script type="text/javascript">
+
+$('.li-modal').on('click', function(e){
+      e.preventDefault();
+      $('#question-modal').modal('show').find('.modal-content').load($(this).attr('href'));
+    });
+
+
+</script>
