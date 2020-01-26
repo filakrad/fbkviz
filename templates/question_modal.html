@@ -10,10 +10,14 @@
         <a href="{{ url_for('present_question_modal', id=next_id) }}" class="li-modal btn btn-default">
           <i class="fas fa-arrow-right"></i></a>
         {% endif %}
+
+        <a href="{{ url_for('present_question_modal', id=question.id) }}" class="li-modal btn btn-default">
+          <i class="fas fa-cog"></i></a>
       </div>
   </div>
   <span aria-hidden="true">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fas fa-times"></i></button>
+      &nbsp;
   </span>
 </div>
 <div class="modal-body">

@@ -88,8 +88,6 @@ def insert_points(request, question_id):
         db.session.add(new_points)
     db.session.commit()
 
-    return 0
-
 
 def get_question_score(question_id):
     query = db.session.query(
@@ -103,5 +101,19 @@ def get_question_score(question_id):
     head = points.keys()
     points_list = [row2dict(s, head) for s in points]
     return points_list
+
+
+def get_winner(question_id):
+    '''
+    Returns id of winner from question id. If winner doesn't exist, returns None
+    :param question_id: id of a question
+    :return: player_id or None
+    '''
+    points = Points.query.filter(Points.question_id == question_id).all()
+    winner_id = None
+    for p in points:
+        if p.win:
+            winner_id = p.player_id
+    return winner_id
 
 

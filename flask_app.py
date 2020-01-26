@@ -3,6 +3,7 @@ from flask import Flask, render_template, request
 from sqlalchemy import desc
 import config
 import db
+import time_calc
 
 app = Flask(__name__)
 
@@ -82,9 +83,10 @@ def row2dict(row, headers):
 @app.route('/insert_theme',methods=['GET', 'POST'])
 def insert_theme():
     from models import Player
+    from models import Theme
+    last_theme = Theme.query.order_by(desc(Theme.date)).limit(1).all()[0]
+    next_monday = time_calc.get_next_monday(last_theme.date)
     players = Player.query.all()
-    print(players)
-    print(players[0])
     head = ["id", "name"]
     players = [row2dict(p, head) for p in players]
     new_theme = None
@@ -106,13 +108,15 @@ def insert_theme():
             return str(e)
     print(db.engine.pool.status())
     return render_template("insert_theme.html", insert_theme_page=True,
-                           players=players, inserted=new_theme)
+                           players=players, inserted=new_theme, default_date=next_monday)
 
 
 @app.route('/insert_question',methods=['GET', 'POST'])
 def insert_question():
+    import score
     from models import Player
     from models import Theme
+    from models import Question
     players = Player.query.all()
     themes = Theme.query.order_by(desc(Theme.date)).all()
     print(players)
@@ -123,12 +127,17 @@ def insert_question():
     new_question = None
     if request.method == 'POST':
         import question
-        import score
         new_question = question.insert_question(request)
-        new_score = score.insert_points(request, new_question.id)
+        score.insert_points(request, new_question.id)
+    last_question = Question.query.order_by(desc(Question.date)).limit(1).all()[0]
+    next_day = time_calc.get_next_day(last_question.date)
+    last_winner = score.get_winner(last_question.id)
+    rearrange_players(players, last_winner)
+    print(players)
     print(db.engine.pool.status())
     return render_template("insert_question.html", insert_question_page=True,
-                           players=players, themes=themes, inserted=new_question)
+                           players=players, themes=themes, inserted=new_question,
+                           default_date=next_day)
 
 
 @app.route('/question/<int:id>/')
@@ -169,6 +178,19 @@ def import_csv():
         load_from_csv.process_csv(attachment.get_path(attach))
         attachment.delete_attachment(attach)
     return render_template("import_csv.html")
+
+
+def rearrange_players(players, top_player_id):
+    if top_player_id is None:
+        return
+    for i, p in enumerate(players):
+        if p["id"] == top_player_id:
+            break
+    else:
+        return
+    top_player = players.pop(i)
+    players.insert(0, top_player)
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5957)
