@@ -76,7 +76,7 @@ def get_random_question():
     Search database for questions and returns random one
     :returns: question transformed to dictionary
     '''
-    question = Question.query.order_by(func.random()).limit(1)
+    question = Question.query.order_by(func.random()).limit(1).all()
     return question_to_dict(question)
 
 
