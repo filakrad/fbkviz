@@ -3,7 +3,13 @@ from flask import Flask, render_template, request
 from sqlalchemy import desc
 import config
 import db
+
+import question as q_module
+import score
+import attachment
 import time_calc
+
+from models import Player, Question, Theme
 
 app = Flask(__name__)
 
@@ -19,12 +25,8 @@ def shutdown_session(exception=None):
 @app.route('/')
 def index():
     try:
-        import question
-        import attachment
-        q = question.get_random_question()
+        q = q_module.get_random_question()
         attachment.append_attachment(q)
-        if not q["correct_answer"]:
-            q["correct_answer"] = "Nenašel jsem správnou odpověď"
         print(db.engine.pool.status())
         return render_template("main_page.html", index_page=True, question=q)
     except:
@@ -34,9 +36,8 @@ def index():
 
 @app.route('/questions')
 def show_questions():
-    import question
-    questions = question.get_all_questions()
-    span_list = question.get_span_list(questions)
+    questions = q_module.get_all_questions()
+    span_list = q_module.get_span_list(questions)
     print(span_list)
     print(db.engine.pool.status())
     return render_template("questions.html", questions_page=True,
@@ -45,7 +46,6 @@ def show_questions():
 
 @app.route('/scores')
 def show_scores():
-    import score
     scores = score.get_players_score()
     score_table = score.get_players_score_table()
     print(db.engine.pool.status())
@@ -56,7 +56,6 @@ def show_scores():
 @app.route('/insert_player',methods=['GET', 'POST'])
 def insert_player():
     if request.method == 'POST':
-        from models import Player
         name = request.form.get('name')
         date_start = request.form.get('date_start')
         try:
@@ -82,8 +81,6 @@ def row2dict(row, headers):
 
 @app.route('/insert_theme',methods=['GET', 'POST'])
 def insert_theme():
-    from models import Player
-    from models import Theme
     last_theme = Theme.query.order_by(desc(Theme.date)).limit(1).all()[0]
     next_monday = time_calc.get_next_monday(last_theme.date)
     players = Player.query.all()
@@ -91,7 +88,6 @@ def insert_theme():
     players = [row2dict(p, head) for p in players]
     new_theme = None
     if request.method == 'POST':
-        from models import Theme
         name = request.form.get('name')
         player_id = int(request.form.get('player'))
         print(player_id)
@@ -113,10 +109,6 @@ def insert_theme():
 
 @app.route('/insert_question',methods=['GET', 'POST'])
 def insert_question():
-    import score
-    from models import Player
-    from models import Theme
-    from models import Question
     players = Player.query.all()
     themes = Theme.query.order_by(desc(Theme.date)).all()
     print(players)
@@ -126,8 +118,7 @@ def insert_question():
     themes = [row2dict(t, head) for t in themes]
     new_question = None
     if request.method == 'POST':
-        import question
-        new_question = question.insert_question(request)
+        new_question = q_module.insert_question(request)
         score.insert_points(request, new_question.id)
     last_question = Question.query.order_by(desc(Question.date)).limit(1).all()[0]
     next_day = time_calc.get_next_day(last_question.date)
@@ -143,15 +134,10 @@ def insert_question():
 @app.route('/question/<int:id>/')
 def present_question_modal(id):
     print("id {}".format(id))
-    import question as q_module
-    import attachment
-    import score
     question = q_module.get_question_by_id(id)
     print(question)
     attachment.append_attachment(question)
     print(question["attachments"])
-    if not question["correct_answer"]:
-        question["correct_answer"] = "Nenašel jsem správnou odpověď"
     all_points = score.get_question_score(question["id"])
     next_id = question['id'] + 1
     prev_id = question['id'] - 1
@@ -167,17 +153,22 @@ def minimal_fct():
 
 @app.route('/import_csv/', methods=['GET', 'POST'])
 def import_csv():
+    import load_from_csv
     if request.method == 'POST':
-        import attachment
         if 'in_csv' not in request.files:
             print(request.files)
             attach = None
         else:
             attach = attachment.save_attachments(request.files['in_csv'])
-        import load_from_csv
         load_from_csv.process_csv(attachment.get_path(attach))
         attachment.delete_attachment(attach)
     return render_template("import_csv.html")
+
+
+@app.route('/update_question/<int:id>/', methods=['GET', 'POST'])
+def update_question():
+    print("id {}".format(id))
+    question = q_module.get_question_by_id(id)
 
 
 def rearrange_players(players, top_player_id):
