@@ -23,7 +23,10 @@ def get_url_path(name):
 
 
 def get_system_path(name):
-    path = os.path.join(os.path.curdir, "static", "attachments")
+    path = os.path.abspath(__file__)
+    path = os.path.dirname(path)
+    path = os.path.join(path, "static", "attachments")
+    print(path)
     return os.path.join(path, name)
 
 
