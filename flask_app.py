@@ -24,15 +24,11 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def index():
-    try:
-        q = q_module.get_random_question()
-        attachment.append_attachment(q)
-        print(db.engine.pool.status())
-        return render_template("main_page.html", index_page=True, question=q)
-    except:
-        db.init_db()
-        return "db initialized"
-
+    q = q_module.get_random_question()
+    attachment.append_attachment(q)
+    print(db.engine.pool.status())
+    return render_template("main_page.html", index_page=True, question=q)
+    
 
 @app.route('/questions')
 def show_questions():

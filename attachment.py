@@ -24,6 +24,8 @@ def get_url_path(name):
 
 def get_system_path(name):
     path = os.path.join(os.path.curdir, "static", "attachments")
+    path = os.path.abspath(path)
+    print(path)
     return os.path.join(path, name)
 
 
